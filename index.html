@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Real-Time Natural Disaster Monitoring</title>
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    if (!sessionStorage.getItem('loggedIn')) {
+        window.location.href = 'login.html'; 
+    }
+  </script>
+</head>
+<body>
+  <header>
+    <h1>Real-Time Natural Disaster Monitoring</h1>
+  </header>
+
+  <section class="earthquake-section">
+    <h2>Recent Earthquakes</h2>
+    <ul id="earthquake-list"></ul>
+  </section>
+
+  <section class="weather-section">
+    <h2>Current Weather (Storms)</h2>
+    <div id="weather-info">Loading weather data...</div>
+  </section>
+
+  <footer>
+    <p>© 2024 Disaster Monitoring System - All Rights Reserved</p>
+  </footer>
+
+  <script>
+    const apiKey = '53606528706ed18cf17cbdb6b1493766'; 
+    
+    function fetchEarthquakes() {
+      fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson')
+        .then(response => response.json())
+        .then(data => {
+          const earthquakes = data.features;
+          const earthquakeList = document.getElementById('earthquake-list');
+          earthquakeList.innerHTML = ''; 
+
+          earthquakes.forEach(quake => {
+            const quakeLocation = quake.properties.place;
+            const quakeMagnitude = quake.properties.mag;
+            const quakeTime = new Date(quake.properties.time).toLocaleString();
+            
+            fetchWeatherForLocation(quakeLocation, quakeMagnitude, quakeTime, earthquakeList);
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching earthquake data:', error);
+        });
+    }
+
+    function fetchWeatherForLocation(location, magnitude, time, earthquakeList) {
+      fetch(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(location)}&appid=${apiKey}`)
+        .then(response => response.json())
+        .then(data => {
+          const weatherDescription = data.weather[0].description;
+          const temperature = (data.main.temp - 273.15).toFixed(2); 
+          const windSpeed = data.wind.speed;
+
+          const listItem = document.createElement('li');
+          listItem.innerHTML = `
+            <strong>Location:</strong> 
+            <a href="https://en.wikipedia.org/wiki/${encodeURIComponent(location.replace(/ /g, '_'))}" target="_blank">${location}</a> <br>
+            <strong>Magnitude:</strong> ${magnitude} <br>
+            <strong>Time:</strong> ${time} <br>
+            <strong>Weather:</strong> ${weatherDescription} <br>
+            <strong>Temperature:</strong> ${temperature}°C <br>
+            <strong>Wind Speed:</strong> ${windSpeed} m/s <br>
+          `;
+          earthquakeList.appendChild(listItem);
+        })
+        .catch(error => {
+          console.error('Error fetching weather data for location:', error);
+          const listItem = document.createElement('li');
+          listItem.innerHTML = `
+            <strong>Location:</strong> 
+            <a href="https://en.wikipedia.org/wiki/${encodeURIComponent(location.replace(/ /g, '_'))}" target="_blank">${location}</a> <br>
+            <strong>Magnitude:</strong> ${magnitude} <br>
+            <strong>Time:</strong> ${time} <br>
+            <strong>Weather:</strong> Data not available <br>
+          `;
+          earthquakeList.appendChild(listItem);
+        });
+    }
+
+    function fetchWeather() {
+      const city = 'YOUR_CITY'; 
+      fetch(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}`)
+        .then(response => response.json())
+        .then(data => {
+          const weatherInfo = document.getElementById('weather-info');
+          const weatherDescription = data.weather[0].description;
+          const temperature = (data.main.temp - 273.15).toFixed(2);
+          const windSpeed = data.wind.speed;
+
+          weatherInfo.innerHTML = `
+            <strong>Location:</strong> ${data.name} <br>
+            <strong>Weather:</strong> ${weatherDescription} <br>
+            <strong>Temperature:</strong> ${temperature}°C <br>
+            <strong>Wind Speed:</strong> ${windSpeed} m/s <br>
+            <div class="weather-image">
+              <img src="https://source.unsplash.com/1600x900/?storm,weather" alt="Weather Image">
+            </div>
+          `;
+        })
+        .catch(error => {
+          console.error('Error fetching weather data:', error);
+          document.getElementById('weather-info').innerHTML = 'Weather data not available.';
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchEarthquakes();
+      fetchWeather(); 
+    });
+  </script>
+</body>
+</html>
