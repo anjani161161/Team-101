@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AtmosWatch | Full Disaster Management Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    if (!sessionStorage.getItem('loggedIn')) {
+      window.location.href = 'login.html';
+    }
+  </script>
+</head>
+<body class="dashboard-page disaster-page">
+  <div class="scroll-progress" id="scroll-progress"></div>
+
+  <header class="site-header subpage-header" id="top">
+    <nav class="topbar container">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">A</span>
+        <span>AtmosWatch</span>
+      </a>
+
+      <button class="menu-toggle" id="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links">
+        Menu
+      </button>
+
+      <div class="nav-links" id="nav-links">
+        <a href="#earthquakes-section">Earthquakes</a>
+        <a href="#wildfires-section">Wildfires</a>
+        <a href="#storms-section">Storms</a>
+        <a href="#volcanoes-section">Volcanoes</a>
+        <a href="#landslides-section">Landslides</a>
+        <a href="#drought-section">Drought</a>
+      </div>
+
+      <div class="subpage-actions">
+        <a class="ghost-link" href="index.html">Back to dashboard</a>
+        <button class="nav-action" id="logout-btn" type="button">Logout</button>
+      </div>
+    </nav>
+
+    <section class="subpage-hero container reveal">
+      <div class="subpage-copy">
+        <p class="eyebrow">Extended disaster management</p>
+        <h1>Full incident coverage with separate sections for every major hazard feed.</h1>
+        <p class="hero-text">
+          This page expands the dashboard into a full disaster management center so visitors can review
+          more incidents, move between hazard categories, and use response guidance in one place.
+        </p>
+      </div>
+
+      <div class="subpage-stat-grid">
+        <article class="snapshot-card">
+          <span class="snapshot-label">Earthquakes</span>
+          <strong id="detail-earthquake-count">--</strong>
+          <p>USGS global seismic feed over the latest 24 hours.</p>
+        </article>
+        <article class="snapshot-card">
+          <span class="snapshot-label">Wildfires</span>
+          <strong id="detail-wildfire-count">--</strong>
+          <p>Open wildfire events from NASA EONET.</p>
+        </article>
+        <article class="snapshot-card">
+          <span class="snapshot-label">Severe storms</span>
+          <strong id="detail-storm-count">--</strong>
+          <p>Open storm events with source references.</p>
+        </article>
+        <article class="snapshot-card">
+          <span class="snapshot-label">Other hazards</span>
+          <strong id="detail-other-count">--</strong>
+          <p>Volcanoes, landslides, and drought sections.</p>
+        </article>
+      </div>
+    </section>
+  </header>
+
+  <main>
+    <section class="section-shell reveal">
+      <div class="container">
+        <div class="category-strip">
+          <a class="category-pill" href="#earthquakes-section">Earthquakes</a>
+          <a class="category-pill" href="#wildfires-section">Wildfires</a>
+          <a class="category-pill" href="#storms-section">Severe storms</a>
+          <a class="category-pill" href="#volcanoes-section">Volcanoes</a>
+          <a class="category-pill" href="#landslides-section">Landslides</a>
+          <a class="category-pill" href="#drought-section">Drought</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-shell reveal" id="earthquakes-section">
+      <div class="container">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">USGS disaster feed</p>
+            <h2>Earthquake monitoring</h2>
+          </div>
+          <p class="section-copy">Global seismic incidents from the latest official 24-hour feed.</p>
+        </div>
+        <div class="detail-feed-grid" id="earthquakes-grid">
+          <article class="detail-incident-card">Loading earthquake incidents...</article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-shell section-accent reveal" id="wildfires-section">
+      <div class="container">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">NASA EONET</p>
+            <h2>Wildfire monitoring</h2>
+          </div>
+          <p class="section-copy">Open wildfire events with current location context and source links.</p>
+        </div>
+        <div class="detail-feed-grid" id="wildfires-grid">
+          <article class="detail-incident-card">Loading wildfire incidents...</article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-shell reveal" id="storms-section">
+      <div class="container">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">NASA EONET</p>
+            <h2>Severe storm monitoring</h2>
+          </div>
+          <p class="section-copy">Storm events grouped in a separate section for quick operational review.</p>
+        </div>
+        <div class="detail-feed-grid" id="storms-grid">
+          <article class="detail-incident-card">Loading storm incidents...</article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-shell section-accent reveal" id="volcanoes-section">
+      <div class="container">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">NASA EONET</p>
+            <h2>Volcano monitoring</h2>
+          </div>
+          <p class="section-copy">Volcanic activity incidents for ash, eruption, and heat event awareness.</p>
+        </div>
+        <div class="detail-feed-grid" id="volcanoes-grid">
+          <article class="detail-incident-card">Loading volcano incidents...</article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-shell reveal" id="landslides-section">
+      <div class="container">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">NASA EONET</p>
+            <h2>Landslide monitoring</h2>
+          </div>
+          <p class="section-copy">Slope movement incidents to support terrain and route risk review.</p>
+        </div>
+        <div class="detail-feed-grid" id="landslides-grid">
+          <article class="detail-incident-card">Loading landslide incidents...</article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-shell section-accent reveal" id="drought-section">
+      <div class="container">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">NASA EONET</p>
+            <h2>Drought monitoring</h2>
+          </div>
+          <p class="section-copy">Long-duration water stress events shown in a separate operational section.</p>
+        </div>
+        <div class="detail-feed-grid" id="drought-grid">
+          <article class="detail-incident-card">Loading drought incidents...</article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-shell reveal" id="response-framework">
+      <div class="container">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Management framework</p>
+            <h2>Disaster response flow</h2>
+          </div>
+          <p class="section-copy">Use the same response rhythm across every disaster section.</p>
+        </div>
+
+        <div class="management-grid">
+          <article class="management-card">
+            <p class="panel-kicker">Step 1</p>
+            <h3>Verify the source</h3>
+            <p>Confirm event timing, location, and source link before distributing alerts to others.</p>
+          </article>
+          <article class="management-card">
+            <p class="panel-kicker">Step 2</p>
+            <h3>Map the impact</h3>
+            <p>Check whether homes, transport routes, schools, or utilities fall inside the risk area.</p>
+          </article>
+          <article class="management-card">
+            <p class="panel-kicker">Step 3</p>
+            <h3>Activate response</h3>
+            <p>Move people, supplies, and communications based on the hazard category and severity.</p>
+          </article>
+          <article class="management-card">
+            <p class="panel-kicker">Step 4</p>
+            <h3>Keep monitoring</h3>
+            <p>Re-check the live sections because active incidents can expand, close, or change location.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <a class="brand footer-brand" href="index.html">
+          <span class="brand-mark">A</span>
+          <span>AtmosWatch</span>
+        </a>
+        <p>Extended disaster management coverage with separate hazard sections.</p>
+      </div>
+      <div class="footer-links">
+        <a href="#earthquakes-section">Earthquakes</a>
+        <a href="#wildfires-section">Wildfires</a>
+        <a href="#storms-section">Storms</a>
+        <a href="index.html">Back to Dashboard</a>
+      </div>
+    </div>
+    <p class="footer-note">&copy; 2026 AtmosWatch. Full disaster management center.</p>
+  </footer>
+
+  <script src="disaster.js"></script>
+</body>
+</html>

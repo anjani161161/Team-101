@@ -3,121 +3,428 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Real-Time Natural Disaster Monitoring</title>
+  <title>AtmosWatch | Global Weather and Disaster Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <script>
     if (!sessionStorage.getItem('loggedIn')) {
-        window.location.href = 'login.html'; 
+      window.location.href = 'login.html';
     }
   </script>
 </head>
-<body>
-  <header>
-    <h1>Real-Time Natural Disaster Monitoring</h1>
+<body class="dashboard-page">
+  <div class="scroll-progress" id="scroll-progress"></div>
+
+  <header class="site-header" id="top">
+    <nav class="topbar container">
+      <a class="brand" href="#top">
+        <span class="brand-mark">A</span>
+        <span>AtmosWatch</span>
+      </a>
+
+      <button class="menu-toggle" id="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links">
+        Menu
+      </button>
+
+      <div class="nav-links" id="nav-links">
+        <a href="#weather-explorer">Weather</a>
+        <a href="#global-watch">Global Watch</a>
+        <a href="#disaster-center">Disaster Management</a>
+        <a href="#preparedness">Preparedness</a>
+      </div>
+
+      <button class="nav-action" id="logout-btn" type="button">Logout</button>
+    </nav>
+
+    <section class="hero">
+      <div class="hero-orb hero-orb-one"></div>
+      <div class="hero-orb hero-orb-two"></div>
+      <div class="container hero-grid">
+        <div class="hero-copy reveal">
+          <p class="eyebrow">Weather intelligence across the world</p>
+          <h1>Search any location, track live hazards, and stay ready before disaster strikes.</h1>
+          <p class="hero-text">
+            Explore real-time weather, air quality, five-day forecast trends, earthquakes, wildfires,
+            and severe storm activity in one responsive dashboard built for awareness and action.
+          </p>
+
+          <div class="hero-stats">
+            <article class="hero-stat">
+              <span class="stat-label">24h earthquakes</span>
+              <strong class="stat-value" id="earthquake-count">--</strong>
+            </article>
+            <article class="hero-stat">
+              <span class="stat-label">Open wildfires</span>
+              <strong class="stat-value" id="wildfire-count">--</strong>
+            </article>
+            <article class="hero-stat">
+              <span class="stat-label">Open severe storms</span>
+              <strong class="stat-value" id="storm-count">--</strong>
+            </article>
+          </div>
+        </div>
+
+        <div class="hero-panel reveal">
+          <form class="search-panel" id="weather-form">
+            <p class="panel-kicker">Live location search</p>
+            <h2>Find weather for any city, state, or country</h2>
+            <label class="sr-only" for="location-input">Search location</label>
+            <div class="search-frame">
+              <input
+                id="location-input"
+                name="location"
+                type="text"
+                list="popular-locations"
+                placeholder="Search London, Tokyo, New Delhi, Nairobi..."
+                autocomplete="off"
+                required
+              >
+              <button type="submit">Search</button>
+            </div>
+            <datalist id="popular-locations">
+              <option value="New Delhi, IN"></option>
+              <option value="London, GB"></option>
+              <option value="Tokyo, JP"></option>
+              <option value="New York, US"></option>
+              <option value="Sydney, AU"></option>
+              <option value="Cape Town, ZA"></option>
+            </datalist>
+
+            <div class="panel-actions">
+              <button class="ghost-button" id="geo-btn" type="button">Use my location</button>
+              <p class="status-line" id="search-status">Loading your starter dashboard for New Delhi.</p>
+            </div>
+
+            <div class="quick-searches">
+              <button class="chip" type="button" data-location="Singapore, SG">Singapore</button>
+              <button class="chip" type="button" data-location="Paris, FR">Paris</button>
+              <button class="chip" type="button" data-location="Dubai, AE">Dubai</button>
+              <button class="chip" type="button" data-location="Toronto, CA">Toronto</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <a class="scroll-cue" href="#weather-explorer">Scroll for live dashboard</a>
+    </section>
   </header>
 
-  <section class="earthquake-section">
-    <h2>Recent Earthquakes</h2>
-    <ul id="earthquake-list"></ul>
-  </section>
+  <main>
+    <section class="section-shell reveal" id="weather-explorer">
+      <div class="container">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Forecast explorer</p>
+            <h2>Detailed weather view</h2>
+          </div>
+          <p class="section-copy">
+            Current conditions, local air quality, and short-term outlook update after every search.
+          </p>
+        </div>
 
-  <section class="weather-section">
-    <h2>Current Weather (Storms)</h2>
-    <div id="weather-info">Loading weather data...</div>
-  </section>
+        <div class="weather-layout">
+          <article class="weather-summary glass-card" id="weather-summary">
+            <p class="panel-kicker">Current conditions</p>
+            <div class="summary-header">
+              <div>
+                <h3 id="weather-location">Preparing dashboard...</h3>
+                <p id="weather-description">Fetching the latest weather data.</p>
+              </div>
+              <img id="weather-icon" src="" alt="" hidden>
+            </div>
 
-  <footer>
-    <p>© 2024 Disaster Monitoring System - All Rights Reserved</p>
+            <div class="temperature-row">
+              <strong id="weather-temp">--</strong>
+              <div class="temp-meta">
+                <span id="weather-range">High -- / Low --</span>
+                <span id="weather-updated">Updated --</span>
+              </div>
+            </div>
+
+            <div class="weather-tags" id="weather-tags"></div>
+          </article>
+
+          <div class="detail-grid">
+            <article class="detail-card">
+              <span>Feels like</span>
+              <strong id="metric-feels-like">--</strong>
+            </article>
+            <article class="detail-card">
+              <span>Humidity</span>
+              <strong id="metric-humidity">--</strong>
+            </article>
+            <article class="detail-card">
+              <span>Wind speed</span>
+              <strong id="metric-wind">--</strong>
+            </article>
+            <article class="detail-card">
+              <span>Visibility</span>
+              <strong id="metric-visibility">--</strong>
+            </article>
+            <article class="detail-card">
+              <span>Pressure</span>
+              <strong id="metric-pressure">--</strong>
+            </article>
+            <article class="detail-card">
+              <span>Cloud cover</span>
+              <strong id="metric-clouds">--</strong>
+            </article>
+          </div>
+        </div>
+
+        <div class="forecast-panel glass-card">
+          <div class="panel-heading-row">
+            <div>
+              <p class="panel-kicker">5 day outlook</p>
+              <h3>Daily forecast trend</h3>
+            </div>
+            <p id="forecast-caption">Forecast cards will appear after weather data loads.</p>
+          </div>
+          <div class="forecast-cards" id="forecast-cards"></div>
+        </div>
+
+        <div class="air-panel glass-card" id="air-quality-card">
+          <div>
+            <p class="panel-kicker">Air quality</p>
+            <h3 id="air-quality-title">Air quality data loading</h3>
+          </div>
+          <div class="air-grid">
+            <div class="air-badge" id="air-quality-badge">--</div>
+            <div class="air-metrics">
+              <p id="air-quality-text">Waiting for the latest pollution index.</p>
+              <div class="air-components">
+                <span id="air-pm25">PM2.5 --</span>
+                <span id="air-pm10">PM10 --</span>
+                <span id="air-o3">O3 --</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-shell section-accent reveal" id="global-watch">
+      <div class="container">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Global watch</p>
+            <h2>Snapshot of active risk signals</h2>
+          </div>
+          <p class="section-copy">
+            This overview combines public earthquake and NASA natural event feeds to highlight areas needing attention.
+          </p>
+        </div>
+
+        <div class="snapshot-grid">
+          <article class="snapshot-card">
+            <span class="snapshot-label">Current search</span>
+            <strong id="snapshot-location">New Delhi</strong>
+            <p id="snapshot-impact">Weather risk summary will update here.</p>
+          </article>
+          <article class="snapshot-card">
+            <span class="snapshot-label">Earthquake intensity</span>
+            <strong id="snapshot-earthquake">Monitoring</strong>
+            <p>Based on the latest United States Geological Survey feed for the past 24 hours.</p>
+          </article>
+          <article class="snapshot-card">
+            <span class="snapshot-label">Wildfire pressure</span>
+            <strong id="snapshot-wildfire">Monitoring</strong>
+            <p>Open events are pulled from NASA EONET wildfire activity updates.</p>
+          </article>
+          <article class="snapshot-card">
+            <span class="snapshot-label">Storm pressure</span>
+            <strong id="snapshot-storm">Monitoring</strong>
+            <p>Open severe storm events update from NASA EONET as data becomes available.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-shell reveal" id="disaster-center">
+      <div class="container">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Disaster management center</p>
+            <h2>Live monitoring across multiple disaster categories</h2>
+          </div>
+          <p class="section-copy">
+            The dashboard pairs weather search with hazard feeds so the site does more than display forecasts.
+          </p>
+        </div>
+
+        <div class="monitor-grid">
+          <article class="monitor-card">
+            <div class="panel-heading-row">
+              <div>
+                <p class="panel-kicker">USGS feed</p>
+                <h3>Recent earthquakes</h3>
+              </div>
+              <a href="https://earthquake.usgs.gov/earthquakes/feed/" target="_blank" rel="noreferrer">Source</a>
+            </div>
+            <ul class="feed-list" id="earthquake-list">
+              <li class="placeholder-item">Loading earthquake activity...</li>
+            </ul>
+            <div class="monitor-card-footer">
+              <a class="view-more-link" href="disaster-management.html#earthquakes-section">
+                <span class="view-more-arrow">v</span>
+                <span>View more</span>
+              </a>
+            </div>
+          </article>
+
+          <article class="monitor-card">
+            <div class="panel-heading-row">
+              <div>
+                <p class="panel-kicker">NASA EONET</p>
+                <h3>Open wildfires</h3>
+              </div>
+              <a href="https://eonet.gsfc.nasa.gov/" target="_blank" rel="noreferrer">Source</a>
+            </div>
+            <ul class="feed-list" id="wildfire-list">
+              <li class="placeholder-item">Loading wildfire activity...</li>
+            </ul>
+            <div class="monitor-card-footer">
+              <a class="view-more-link" href="disaster-management.html#wildfires-section">
+                <span class="view-more-arrow">v</span>
+                <span>View more</span>
+              </a>
+            </div>
+          </article>
+
+          <article class="monitor-card">
+            <div class="panel-heading-row">
+              <div>
+                <p class="panel-kicker">NASA EONET</p>
+                <h3>Open severe storms</h3>
+              </div>
+              <a href="https://eonet.gsfc.nasa.gov/" target="_blank" rel="noreferrer">Source</a>
+            </div>
+            <ul class="feed-list" id="storm-list">
+              <li class="placeholder-item">Loading severe storm activity...</li>
+            </ul>
+            <div class="monitor-card-footer">
+              <a class="view-more-link" href="disaster-management.html#storms-section">
+                <span class="view-more-arrow">v</span>
+                <span>View more</span>
+              </a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-shell reveal" id="preparedness">
+      <div class="container">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Preparedness playbook</p>
+            <h2>Interactive disaster management guidance</h2>
+          </div>
+          <p class="section-copy">
+            Every section expands with practical actions so visitors can move from awareness to response.
+          </p>
+        </div>
+
+        <div class="accordion-grid">
+          <article class="accordion-card">
+            <button class="accordion-trigger" type="button" aria-expanded="true">
+              Earthquake readiness
+            </button>
+            <div class="accordion-content is-open">
+              <ul>
+                <li>Anchor heavy shelves, water tanks, and appliances before seismic activity begins.</li>
+                <li>Practice drop, cover, and hold on with everyone in the household.</li>
+                <li>Keep shoes, torch, power bank, and essential medicine in a go-bag near exits.</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="accordion-card">
+            <button class="accordion-trigger" type="button" aria-expanded="false">
+              Flood response planning
+            </button>
+            <div class="accordion-content">
+              <ul>
+                <li>Track rainfall, river updates, and route closures before travel into low-lying areas.</li>
+                <li>Move documents, electronics, and backup food above expected flood height.</li>
+                <li>Never walk or drive through moving water, even when the depth looks shallow.</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="accordion-card">
+            <button class="accordion-trigger" type="button" aria-expanded="false">
+              Severe storm checklist
+            </button>
+            <div class="accordion-content">
+              <ul>
+                <li>Secure outdoor furniture, loose roofing materials, and drainage around the home.</li>
+                <li>Store offline copies of emergency contacts and identify the safest indoor room.</li>
+                <li>Charge devices early and prepare for power disruption and transport delays.</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="accordion-card">
+            <button class="accordion-trigger" type="button" aria-expanded="false">
+              Wildfire protection
+            </button>
+            <div class="accordion-content">
+              <ul>
+                <li>Create a clear zone around buildings by removing dry vegetation and debris.</li>
+                <li>Keep masks, first aid supplies, and evacuation papers ready during active fire seasons.</li>
+                <li>Leave early when evacuation alerts are issued because smoke and road closures can spread fast.</li>
+              </ul>
+            </div>
+          </article>
+        </div>
+
+        <div class="management-grid">
+          <article class="management-card">
+            <p class="panel-kicker">Response step 1</p>
+            <h3>Assess the signal</h3>
+            <p>Compare weather severity, hazard feed location, and timing before taking action.</p>
+          </article>
+          <article class="management-card">
+            <p class="panel-kicker">Response step 2</p>
+            <h3>Share the plan</h3>
+            <p>Tell family or team members where to meet, who to call, and what route stays safest.</p>
+          </article>
+          <article class="management-card">
+            <p class="panel-kicker">Response step 3</p>
+            <h3>Move with essentials</h3>
+            <p>Carry water, identity documents, medicine, cash, and device backup before leaving.</p>
+          </article>
+          <article class="management-card">
+            <p class="panel-kicker">Response step 4</p>
+            <h3>Recheck conditions</h3>
+            <p>Use live feeds again after movement because hazards can change by the hour.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <a class="brand footer-brand" href="#top">
+          <span class="brand-mark">A</span>
+          <span>AtmosWatch</span>
+        </a>
+        <p>Responsive weather and disaster management dashboard for global awareness.</p>
+      </div>
+      <div class="footer-links">
+        <a href="#weather-explorer">Weather Search</a>
+        <a href="#disaster-center">Live Monitoring</a>
+        <a href="#preparedness">Preparedness</a>
+      </div>
+    </div>
+    <p class="footer-note">&copy; 2026 AtmosWatch. Built for real-time weather awareness and disaster readiness.</p>
   </footer>
 
-  <script>
-    const apiKey = '53606528706ed18cf17cbdb6b1493766'; 
-    
-    function fetchEarthquakes() {
-      fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson')
-        .then(response => response.json())
-        .then(data => {
-          const earthquakes = data.features;
-          const earthquakeList = document.getElementById('earthquake-list');
-          earthquakeList.innerHTML = ''; 
-
-          earthquakes.forEach(quake => {
-            const quakeLocation = quake.properties.place;
-            const quakeMagnitude = quake.properties.mag;
-            const quakeTime = new Date(quake.properties.time).toLocaleString();
-            
-            fetchWeatherForLocation(quakeLocation, quakeMagnitude, quakeTime, earthquakeList);
-          });
-        })
-        .catch(error => {
-          console.error('Error fetching earthquake data:', error);
-        });
-    }
-
-    function fetchWeatherForLocation(location, magnitude, time, earthquakeList) {
-      fetch(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(location)}&appid=${apiKey}`)
-        .then(response => response.json())
-        .then(data => {
-          const weatherDescription = data.weather[0].description;
-          const temperature = (data.main.temp - 273.15).toFixed(2); 
-          const windSpeed = data.wind.speed;
-
-          const listItem = document.createElement('li');
-          listItem.innerHTML = `
-            <strong>Location:</strong> 
-            <a href="https://en.wikipedia.org/wiki/${encodeURIComponent(location.replace(/ /g, '_'))}" target="_blank">${location}</a> <br>
-            <strong>Magnitude:</strong> ${magnitude} <br>
-            <strong>Time:</strong> ${time} <br>
-            <strong>Weather:</strong> ${weatherDescription} <br>
-            <strong>Temperature:</strong> ${temperature}°C <br>
-            <strong>Wind Speed:</strong> ${windSpeed} m/s <br>
-          `;
-          earthquakeList.appendChild(listItem);
-        })
-        .catch(error => {
-          console.error('Error fetching weather data for location:', error);
-          const listItem = document.createElement('li');
-          listItem.innerHTML = `
-            <strong>Location:</strong> 
-            <a href="https://en.wikipedia.org/wiki/${encodeURIComponent(location.replace(/ /g, '_'))}" target="_blank">${location}</a> <br>
-            <strong>Magnitude:</strong> ${magnitude} <br>
-            <strong>Time:</strong> ${time} <br>
-            <strong>Weather:</strong> Data not available <br>
-          `;
-          earthquakeList.appendChild(listItem);
-        });
-    }
-
-    function fetchWeather() {
-      const city = 'YOUR_CITY'; 
-      fetch(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}`)
-        .then(response => response.json())
-        .then(data => {
-          const weatherInfo = document.getElementById('weather-info');
-          const weatherDescription = data.weather[0].description;
-          const temperature = (data.main.temp - 273.15).toFixed(2);
-          const windSpeed = data.wind.speed;
-
-          weatherInfo.innerHTML = `
-            <strong>Location:</strong> ${data.name} <br>
-            <strong>Weather:</strong> ${weatherDescription} <br>
-            <strong>Temperature:</strong> ${temperature}°C <br>
-            <strong>Wind Speed:</strong> ${windSpeed} m/s <br>
-            <div class="weather-image">
-              <img src="https://source.unsplash.com/1600x900/?storm,weather" alt="Weather Image">
-            </div>
-          `;
-        })
-        .catch(error => {
-          console.error('Error fetching weather data:', error);
-          document.getElementById('weather-info').innerHTML = 'Weather data not available.';
-        });
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      fetchEarthquakes();
-      fetchWeather(); 
-    });
-  </script>
+  <script src="app.js"></script>
 </body>
 </html>
