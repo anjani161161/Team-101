@@ -132,9 +132,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Natural disaster monitoring services for real-time data
 - Font families: DM Sans and Space Grotesk from Google Fonts
 
-## 📞 Support
-
-For support, email support@atmoswatch.com or create an issue in this repository.
 
 ## 🔄 Version History
 
