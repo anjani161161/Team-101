@@ -6,6 +6,7 @@ import App from "./app/App.jsx";
 import "leaflet/dist/leaflet.css";
 import "./styles/tokens.css";
 import "./styles/global.css";
+import "./styles/visuals.css";
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
