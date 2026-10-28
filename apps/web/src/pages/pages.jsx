@@ -20,6 +20,8 @@ import {
   EyeOff,
   GraduationCap,
   Mountain,
+  Layers,
+  Satellite,
   Plus,
   RefreshCw,
   Search,
@@ -1108,21 +1110,49 @@ const hazardPin = L.divIcon({
   iconAnchor: [9, 9],
 });
 function HazardMap({ events }) {
+  const [mapLayer, setMapLayer] = useState("street");
   const markers = events.filter(
-    (event) => event.coordinates?.latitude && event.coordinates?.longitude
+    (event) => event.coordinates?.latitude != null && event.coordinates?.longitude != null
   );
   return (
     <div className="map-frame">
+      <div className="map-layer-control" role="group" aria-label="Choose map layer">
+        <button
+          type="button"
+          className={mapLayer === "street" ? "active" : ""}
+          aria-pressed={mapLayer === "street"}
+          onClick={() => setMapLayer("street")}
+        >
+          <Layers size={14} /> Street
+        </button>
+        <button
+          type="button"
+          className={mapLayer === "satellite" ? "active" : ""}
+          aria-pressed={mapLayer === "satellite"}
+          onClick={() => setMapLayer("satellite")}
+        >
+          <Satellite size={14} /> Satellite
+        </button>
+      </div>
       <MapContainer
         center={[20.59, 78.96]}
         zoom={3}
         scrollWheelZoom={false}
         aria-label="Map of reported global hazard observations"
       >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+        {mapLayer === "satellite" ? (
+          <TileLayer
+            attribution='Tiles &copy; <a href="https://www.esri.com/">Esri</a> — Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community'
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+            maxZoom={19}
+          />
+        ) : (
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            maxZoom={19}
+          />
+        )}
         {markers.map((event) => (
           <Marker
             key={event.id}
