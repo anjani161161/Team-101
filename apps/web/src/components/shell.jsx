@@ -32,7 +32,7 @@ const roleLinks = {
     { to: "/academy", label: "Learning curriculum", icon: GraduationCap },
     { to: "/learning/disasters", label: "Disaster Learning Hub", icon: BookOpenText },
     { to: "/visuals", label: "Visual learning", icon: Images },
-    { to: "/disaster-updates", label: "Disaster articles", icon: Newspaper },
+    { to: "/articles", label: "Disaster articles", icon: Newspaper },
     { to: "/quizzes", label: "Institution quizzes", icon: ClipboardList },
     { to: "/intelligence", label: "Hazard intelligence", icon: Activity },
     { to: "/admin/audit", label: "Audit log", icon: FileText },
