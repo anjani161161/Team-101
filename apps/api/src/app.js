@@ -13,6 +13,7 @@ import weatherRoutes from "./modules/weather/routes.js";
 import resourceRoutes from "./modules/resources/routes.js";
 import userRoutes from "./modules/users/routes.js";
 import publicDisasterUpdatesRoutes from "./modules/public/disaster-updates.js";
+import visualRoutes from "./modules/visuals/routes.js";
 import mongoose from "mongoose";
 import { rateLimit, ipKeyGenerator } from "express-rate-limit";
 import { isAllowedOrigin } from "./security/origins.js";
@@ -48,7 +49,7 @@ app.use((req, _res, next) => {
   } else if (pathname.startsWith("/v1/")) {
     normalizedPath = `/api${pathname}`;
   } else if (
-    /^\/(auth|users|learning|simulations|preparedness|hazards|weather|resources|public)(\/|$)/.test(pathname)
+    /^\/(auth|users|learning|simulations|preparedness|hazards|weather|resources|public|visuals)(\/|$)/.test(pathname)
   ) {
     normalizedPath = `/api/v1${pathname}`;
   }
@@ -65,6 +66,7 @@ const databaseRoutePrefixes = [
   "/api/v1/learning",
   "/api/v1/preparedness",
   "/api/v1/simulations",
+  "/api/v1/visuals",
 ];
 
 app.use(async (req, res, next) => {
@@ -128,6 +130,7 @@ app.use("/api/v1/hazards", providerLimit, hazardRoutes);
 app.use("/api/v1/weather", providerLimit, weatherRoutes);
 app.use("/api/v1/resources", resourceRoutes);
 app.use("/api/v1/public", publicDisasterUpdatesRoutes);
+app.use("/api/v1/visuals", visualRoutes);
 app.use((_req, res) =>
   res
     .status(404)
