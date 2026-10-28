@@ -31,6 +31,28 @@ app.use(
 );
 app.use(express.json({ limit: "32kb" }));
 app.use(cookieParser());
+
+// Normalize common API prefixes in case a deployment rewrite or function mount
+// strips the leading /api or /api/v1 segment. Keep existing full paths unchanged.
+app.use((req, _res, next) => {
+  const queryIndex = req.url.indexOf("?");
+  const pathname = queryIndex === -1 ? req.url : req.url.slice(0, queryIndex);
+  const query = queryIndex === -1 ? "" : req.url.slice(queryIndex);
+
+  let normalizedPath = pathname;
+  if (pathname === "/health") {
+    normalizedPath = "/api/v1/health";
+  } else if (pathname.startsWith("/v1/")) {
+    normalizedPath = `/api${pathname}`;
+  } else if (
+    /^\/(auth|users|learning|simulations|preparedness|hazards|weather|resources|public)(\/|$)/.test(pathname)
+  ) {
+    normalizedPath = `/api/v1${pathname}`;
+  }
+
+  if (normalizedPath !== pathname) req.url = `${normalizedPath}${query}`;
+  next();
+});
 const providerLimit = rateLimit({
   windowMs: 60 * 1000,
   limit: 60,
