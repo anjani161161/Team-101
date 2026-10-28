@@ -10,6 +10,7 @@
     "seed": "node src/scripts/seed.js",
     "migrate:roles": "node src/scripts/migrate-roles.js",
     "bootstrap:admin": "node src/scripts/bootstrap-admin.js",
+    "setup:demo-accounts": "node src/scripts/setup-demo-accounts.js",
     "test": "node --test"
   },
   "dependencies": {
