@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { rateLimit } from "express-rate-limit";
+import { rateLimit, ipKeyGenerator } from "express-rate-limit";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { z } from "zod";
@@ -15,6 +15,7 @@ router.use((_req, res, next) => {
 const credentials = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 10,
+  keyGenerator: (req) => ipKeyGenerator(req.ip),
   standardHeaders: "draft-8",
   legacyHeaders: false,
 });
