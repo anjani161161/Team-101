@@ -16,6 +16,7 @@ import publicDisasterUpdatesRoutes from "./modules/public/disaster-updates.js";
 import mongoose from "mongoose";
 import { rateLimit, ipKeyGenerator } from "express-rate-limit";
 import { isAllowedOrigin } from "./security/origins.js";
+import { connectDatabase } from "./config/db.js";
 
 const app = express();
 app.disable("x-powered-by");
@@ -55,6 +56,36 @@ app.use((req, _res, next) => {
   if (normalizedPath !== pathname) req.url = `${normalizedPath}${query}`;
   next();
 });
+
+// Make the API self-sufficient when Vercel loads app.js directly instead of
+// executing the local server.js bootstrap. Await MongoDB before DB-backed routes.
+const databaseRoutePrefixes = [
+  "/api/v1/auth",
+  "/api/v1/users",
+  "/api/v1/learning",
+  "/api/v1/preparedness",
+  "/api/v1/simulations",
+];
+
+app.use(async (req, res, next) => {
+  const path = req.path;
+  const isHealthCheck = path === "/api/v1/health";
+  const needsDatabase =
+    isHealthCheck ||
+    databaseRoutePrefixes.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
+
+  if (!needsDatabase) return next();
+
+  try {
+    await connectDatabase();
+    return next();
+  } catch (error) {
+    console.error(`AtmosWatch database connection failed (${error.name}): ${error.message}`);
+    if (isHealthCheck) return next();
+    return next(error);
+  }
+});
+
 const providerLimit = rateLimit({
   windowMs: 60 * 1000,
   limit: 60,
