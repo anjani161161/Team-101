@@ -108,13 +108,16 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get("/api/v1/health", (_req, res) =>
+const healthHandler = (_req, res) =>
   res.status(200).json({
     status: "ok",
     database: mongoose.connection.readyState === 1 ? "connected" : "unavailable",
     time: new Date().toISOString(),
-  })
-);
+  });
+
+// Support the canonical health path plus common paths used by hosting rewrites.
+app.get(["/", "/health", "/api/health", "/v1/health", "/api/v1/health"], healthHandler);
+
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/learning", learningRoutes);
