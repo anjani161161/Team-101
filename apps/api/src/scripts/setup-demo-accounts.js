@@ -80,7 +80,7 @@ try {
     institutionId: institution._id,
     tokenVersion: 0,
   })));
-  await User.create(documents, { session });
+  await User.create(documents, { session, ordered: true });
 
   await AuditEvent.create([{
     actorId: admin._id,
