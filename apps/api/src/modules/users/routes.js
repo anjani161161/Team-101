@@ -1,6 +1,6 @@
 import { Router } from "express";
 import bcrypt from "bcryptjs";
-import { rateLimit } from "express-rate-limit";
+import { rateLimit, ipKeyGenerator } from "express-rate-limit";
 import { randomBytes } from "node:crypto";
 import { z } from "zod";
 import {
@@ -19,6 +19,7 @@ const router = Router();
 const accountCreationLimit = rateLimit({
   windowMs: 60 * 60 * 1000,
   limit: 30,
+  keyGenerator: (req) => ipKeyGenerator(req.ip),
   standardHeaders: "draft-8",
   legacyHeaders: false,
 });
