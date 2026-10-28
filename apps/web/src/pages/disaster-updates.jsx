@@ -143,6 +143,25 @@ function DisasterEventRow({ event }) {
   );
 }
 
+function NdrfArticleRow({ article }) {
+  return (
+    <article className="disaster-event-row ndrf-article-row">
+      <span className="event-type-icon"><ShieldAlert size={18} /></span>
+      <div className="event-row-main">
+        <span className="disaster-kicker">{article.category} · {article.publisher}</span>
+        <h3><a href={article.originalUrl} target="_blank" rel="noreferrer">{article.title}</a></h3>
+        <p>{article.summary}</p>
+        <span className="article-timestamp">
+          <Clock3 size={14} /> Listed {formatDate(article.publishedAt)}
+        </span>
+      </div>
+      <a className="article-original-link" href={article.originalUrl} target="_blank" rel="noreferrer">
+        Read original <ExternalLink size={14} />
+      </a>
+    </article>
+  );
+}
+
 function NewsFeedStatus({ data, onRefresh, loading }) {
   return (
     <div className="news-feed-status">
@@ -190,14 +209,15 @@ export function DisasterUpdatesPage() {
     <main className="public-content disaster-updates-page">
       <PageHeader
         eyebrow="PUBLIC · RECENTLY PUBLISHED REPORTS"
-        title="Disaster Watch"
-        description="Photo stories and event updates from NASA Earth Observatory and GDACS. A published story is not a live camera or an official local warning."
+        title="Disaster articles & live imagery"
+        description="Recent disaster-related reporting from the official NDRF news-clippings list, NASA Earth Observatory photo stories, and GDACS event data. Images are source-attributed photographs, not live camera feeds or official local warnings."
       />
       <NewsFeedStatus data={data} onRefresh={refresh} loading={loading} />
       <div className="disaster-news-sources">
         {(
           data?.sources || [
             { name: "NASA Earth Observatory", status: "waiting" },
+            { name: "NDRF news clippings", status: "waiting" },
             { name: "GDACS", status: "waiting" },
           ]
         ).map((source) => (
@@ -290,6 +310,33 @@ export function DisasterUpdatesPage() {
                 Open NASA Earth Observatory <ArrowRight size={15} />
               </a>
             }
+          />
+        )}
+      </section>
+      <section className="disaster-news-section disaster-ndrf-articles">
+        <div className="disaster-news-heading">
+          <div>
+            <span className="disaster-kicker">NATIONAL DISASTER RESPONSE FORCE</span>
+            <h2>Latest disaster news clippings</h2>
+            <p>
+              Current article links listed by NDRF. The original publishers own the full reports and any accompanying photographs.
+            </p>
+          </div>
+          <a className="article-original-link" href="https://www.ndrf.gov.in/news-clippings" target="_blank" rel="noreferrer">
+            Official NDRF list <ExternalLink size={14} />
+          </a>
+        </div>
+        {loading && !data ? (
+          <LoadingState label="Loading recent disaster articles" />
+        ) : data?.articles?.length ? (
+          <div className="disaster-event-list">
+            {data.articles.slice(0, 18).map((article) => <NdrfArticleRow key={article.id} article={article} />)}
+          </div>
+        ) : (
+          <EmptyState
+            title="NDRF articles are temporarily unavailable"
+            description="The photo stories above remain available when NASA's feed responds. You can also open the official NDRF news list."
+            action={<a className="button button-outline" href="https://www.ndrf.gov.in/news-clippings" target="_blank" rel="noreferrer">Open NDRF news clippings <ExternalLink size={14} /></a>}
           />
         )}
       </section>
