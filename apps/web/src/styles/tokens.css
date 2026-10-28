@@ -1,0 +1,50 @@
+:root {
+  font-family: "DM Sans", "Segoe UI", sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  color-scheme: light;
+
+  --color-background: #f6f7f5;
+  --color-surface: #ffffff;
+  --color-surface-soft: #edf2f0;
+  --color-text-primary: #263238;
+  --color-text-secondary: #647078;
+  --color-text-tertiary: #77828a;
+  --color-primary: #557c83;
+  --color-primary-hover: #42676e;
+  --color-primary-soft: #eaf0f0;
+  --color-secondary: #718a82;
+  --color-border: #e1e5e2;
+  --color-success: #35745b;
+  --color-success-soft: #eaf2ed;
+  --color-warning: #8b5f22;
+  --color-warning-soft: #f6f0e5;
+  --color-danger: #a43f42;
+  --color-danger-soft: #f7ebea;
+  --color-information: #496f91;
+  --color-information-soft: #edf2f7;
+  --color-sidebar: #34464d;
+  --radius-card: 8px;
+  --shadow-subtle: 0 2px 10px rgba(38, 50, 56, 0.045);
+
+  /* Legacy aliases keep existing feature components on the shared theme. */
+  --ink: var(--color-text-primary);
+  --muted: var(--color-text-secondary);
+  --quiet: var(--color-text-tertiary);
+  --line: var(--color-border);
+  --paper: var(--color-surface);
+  --canvas: var(--color-background);
+  --deep: var(--color-sidebar);
+  --deep-2: #40565e;
+  --teal: var(--color-primary);
+  --teal-soft: var(--color-primary-soft);
+  --blue: var(--color-information);
+  --blue-soft: var(--color-information-soft);
+  --green: var(--color-success);
+  --green-soft: var(--color-success-soft);
+  --amber: var(--color-warning);
+  --amber-soft: var(--color-warning-soft);
+  --red: var(--color-danger);
+  --red-soft: var(--color-danger-soft);
+  --shadow: var(--shadow-subtle);
+}

@@ -1,0 +1,367 @@
+openapi: 3.1.0
+info:
+  title: AtmosWatch Education API
+  version: 1.0.0
+  description: Educational learning, preparedness records, normalized hazard context, and forecast access. Not an emergency dispatch or warning system.
+servers:
+  - url: http://localhost:5000/api/v1
+tags:
+  - name: Auth
+  - name: Learning
+  - name: Simulations
+  - name: Preparedness
+  - name: Hazards
+  - name: Weather
+  - name: Resources
+paths:
+  /health:
+    get:
+      tags: [Auth]
+      summary: API and persistence status
+      responses:
+        "200": { description: API is running; database may be unavailable }
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Public student registration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, password]
+              properties:
+                name: { type: string, minLength: 2, maxLength: 80 }
+                email: { type: string, format: email }
+                password: { type: string, minLength: 12, maxLength: 128 }
+                educationLevel: { type: string, enum: [primary, secondary, college, adult] }
+      responses:
+        "201": { description: Account created; HttpOnly session cookie set }
+        "400": { $ref: "#/components/responses/ValidationError" }
+        "409": { description: Email already registered }
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Create a signed session cookie
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string }
+      responses:
+        "200": { description: Authenticated user profile; HttpOnly cookie set }
+        "401": { description: Invalid credentials }
+  /auth/activate:
+    post:
+      tags: [Auth]
+      summary: Redeem a one-time activation token and set a password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token, password]
+              properties:
+                token: { type: string }
+                password: { type: string, minLength: 12, maxLength: 128 }
+      responses:
+        "200": { description: Activated account and HttpOnly session cookie set }
+        "400": { description: Activation token expired or invalid }
+  /users:
+    get:
+      tags: [Auth]
+      security: [{ sessionCookie: [] }]
+      responses:
+        "200": { description: Admin user list or institution-scoped instructor student list }
+        "403": { description: Student access denied }
+    post:
+      tags: [Auth]
+      security: [{ sessionCookie: [] }]
+      responses:
+        "201": { description: Inactive account and one-time activation token created }
+        "403": { description: Role or institution scope denied }
+  /users/{id}:
+    patch:
+      tags: [Auth]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      responses:
+        "200": { description: Updated account in authorized scope }
+        "404": { description: User outside authorized scope }
+        "409": { description: Final active administrator cannot be removed }
+  /users/analytics:
+    get:
+      tags: [Auth]
+      security: [{ sessionCookie: [] }]
+      responses:
+        "200": { description: Persisted platform metrics; administrator only }
+        "403": { description: Administrator role required }
+  /users/audit:
+    get:
+      tags: [Auth]
+      security: [{ sessionCookie: [] }]
+      responses:
+        "200": { description: Read-only audit events; administrator only }
+        "403": { description: Administrator role required }
+  /auth/me:
+    get:
+      tags: [Auth]
+      security: [{ sessionCookie: [] }]
+      responses:
+        "200": { description: Current authenticated user }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /auth/logout:
+    post:
+      tags: [Auth]
+      responses:
+        "204": { description: Session cookie cleared }
+  /learning/modules:
+    get:
+      tags: [Learning]
+      responses:
+        "200": { description: Curated public lesson pathways without assessment answer keys }
+  /learning/modules/{moduleId}:
+    get:
+      tags: [Learning]
+      parameters:
+        - { in: path, name: moduleId, required: true, schema: { type: string } }
+      responses:
+        "200": { description: Module lessons and quiz choices; correct answers are withheld }
+        "404": { description: Module not found }
+  /learning/modules/{moduleId}/quiz:
+    post:
+      tags: [Learning]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - { in: path, name: moduleId, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [answers]
+              properties:
+                answers:
+                  type: array
+                  items:
+                    type: object
+                    required: [questionId, choiceId]
+                    properties:
+                      questionId: { type: string }
+                      choiceId: { type: string }
+      responses:
+        "200":
+          {
+            description: Server-scored quiz and answer explanations; score saved to learner progress,
+          }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /learning/progress:
+    get:
+      tags: [Learning]
+      security: [{ sessionCookie: [] }]
+      responses:
+        "200": { description: Current user's lesson and quiz progress }
+  /learning/progress/{moduleId}:
+    put:
+      tags: [Learning]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - { in: path, name: moduleId, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                completedLessons: { type: array, items: { type: string } }
+                quizScore: { type: number, minimum: 0, maximum: 100 }
+      responses:
+        "200": { description: Updated current-user progress }
+  /simulations/scenarios:
+    get:
+      tags: [Simulations]
+      responses:
+        "200": { description: Public educational simulation index }
+  /simulations/scenarios/{scenarioId}:
+    get:
+      tags: [Simulations]
+      parameters:
+        - { in: path, name: scenarioId, required: true, schema: { type: string } }
+      responses:
+        "200": { description: Simulation steps and choices without scoring keys }
+  /simulations/attempts:
+    get:
+      tags: [Simulations]
+      security: [{ sessionCookie: [] }]
+      responses:
+        "200": { description: Current user's simulation attempts }
+    post:
+      tags: [Simulations]
+      security: [{ sessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [scenarioId, answers]
+              properties:
+                scenarioId: { type: string }
+                answers:
+                  {
+                    type: array,
+                    items:
+                      {
+                        type: object,
+                        required: [stepId, choiceId],
+                        properties: { stepId: { type: string }, choiceId: { type: string } },
+                      },
+                  }
+      responses:
+        "201": { description: Saved server-scored simulation attempt with learning feedback }
+  /hazards/sources:
+    get:
+      tags: [Hazards]
+      responses:
+        "200": { description: Provider availability, credential and attribution metadata }
+  /hazards/events:
+    get:
+      tags: [Hazards]
+      parameters:
+        - { in: query, name: source, schema: { type: string, enum: [usgs, gdacs], default: gdacs } }
+        - {
+            in: query,
+            name: type,
+            schema:
+              { type: string, enum: [earthquake, cyclone, flood, volcano, drought, wildfire] },
+          }
+        - { in: query, name: alertLevel, schema: { type: string, enum: [green, orange, red] } }
+        - { in: query, name: minMagnitude, schema: { type: number, minimum: -2, maximum: 10 } }
+        - {
+            in: query,
+            name: fromDate,
+            description: Inclusive ISO date; pair with toDate for a range of at most 90 days.,
+            schema: { type: string, format: date },
+          }
+        - {
+            in: query,
+            name: toDate,
+            description: Inclusive ISO date; cannot be in the future.,
+            schema: { type: string, format: date },
+          }
+        - { in: query, name: limit, schema: { type: integer, minimum: 1, maximum: 100 } }
+      responses:
+        "200":
+          {
+            description: Normalized provider events with source,
+            timestamps,
+            coordinates and data class,
+          }
+        "502": { description: Upstream provider unavailable }
+  /weather:
+    get:
+      tags: [Weather]
+      parameters:
+        - {
+            in: query,
+            name: location,
+            required: true,
+            schema: { type: string, minLength: 2, maxLength: 100 },
+          }
+      responses:
+        "200":
+          {
+            description: Open-Meteo current model output,
+            daily forecast,
+            air-quality model values and attribution,
+          }
+        "404": { description: Place not found }
+  /resources:
+    get:
+      tags: [Resources]
+      parameters:
+        - { in: query, name: q, schema: { type: string } }
+        - { in: query, name: topic, schema: { type: string } }
+      responses:
+        "200": { description: Curated source-linked educational and official resources }
+  /preparedness/institutions:
+    post:
+      tags: [Preparedness]
+      security: [{ sessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, type]
+              properties:
+                name: { type: string, minLength: 2, maxLength: 140 }
+                type: { type: string, enum: [school, college, other] }
+                state: { type: string }
+                district: { type: string }
+                city: { type: string }
+      responses:
+        "201": { description: Institution created by administrator }
+        "403": { description: Administrator role required }
+  /preparedness/checklists:
+    get:
+      tags: [Preparedness]
+      security: [{ sessionCookie: [] }]
+      responses:
+        "200": { description: Current institution's checklists, or empty state for personal users }
+    post:
+      tags: [Preparedness]
+      security: [{ sessionCookie: [] }]
+      responses:
+        "201": { description: Checklist created in current user's institution }
+  /preparedness/checklists/{id}:
+    patch:
+      tags: [Preparedness]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      responses:
+        "200": { description: Checklist updated when it belongs to the authenticated institution }
+        "404": { description: Record not found in this institution }
+  /preparedness/drills:
+    get:
+      tags: [Preparedness]
+      security: [{ sessionCookie: [] }]
+      responses:
+        "200": { description: Current institution's drills }
+    post:
+      tags: [Preparedness]
+      security: [{ sessionCookie: [] }]
+      responses:
+        "201": { description: Drill created for current institution }
+  /preparedness/drills/{id}:
+    patch:
+      tags: [Preparedness]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      responses:
+        "200": { description: Drill updated when it belongs to the authenticated institution }
+        "404": { description: Record not found in this institution }
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: atmoswatch_session
+  responses:
+    Unauthorized:
+      description: Authentication required
+    ValidationError:
+      description: Request validation failed

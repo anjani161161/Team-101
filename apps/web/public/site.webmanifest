@@ -1,0 +1,16 @@
+{
+  "name": "AtmosWatch - Disaster Preparedness and Response Education",
+  "short_name": "AtmosWatch",
+  "description": "A Safer Tomorrow, Together.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d2229",
+  "theme_color": "#0d2229",
+  "icons": [
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

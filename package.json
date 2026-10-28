@@ -1,0 +1,24 @@
+{
+  "name": "atmoswatch-education-platform",
+  "description": "AtmosWatch - Disaster Preparedness and Response Education System for Schools and Colleges",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/web",
+    "apps/api"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -n api,web -c cyan,green \"npm run dev -w @atmoswatch/api\" \"npm run dev -w @atmoswatch/web\"",
+    "dev:web": "npm run dev -w @atmoswatch/web",
+    "dev:api": "npm run dev -w @atmoswatch/api",
+    "build": "npm run build -w @atmoswatch/web",
+    "test": "npm run test -w @atmoswatch/api && npm run test -w @atmoswatch/web",
+    "seed": "npm run seed -w @atmoswatch/api",
+    "format": "prettier --write \"apps/**/*.{js,jsx,css,json,yaml}\" \"docs/**/*.md\" \"datasets/**/*.{json,md}\" \"*.{json,md}\"",
+    "format:check": "prettier --check \"apps/**/*.{js,jsx,css,json,yaml}\" \"docs/**/*.md\" \"datasets/**/*.{json,md}\" \"*.{json,md}\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "prettier": "^3.9.10"
+  }
+}

@@ -1,0 +1,49 @@
+[
+  {
+    "id": "usgs-earthquakes",
+    "source": "https://earthquake.usgs.gov/fdsnws/event/1/",
+    "hazards": ["earthquake"],
+    "format": "GeoJSON",
+    "dataType": "event observations queried by date range",
+    "credentialsRequired": false,
+    "attribution": "USGS"
+  },
+  {
+    "id": "gdacs-events",
+    "source": "https://www.gdacs.org/gdacsapi/swagger/index.html",
+    "hazards": ["earthquake", "cyclone", "flood", "volcano", "drought", "wildfire"],
+    "format": "GeoJSON",
+    "dataType": "live observations and alert levels",
+    "credentialsRequired": false,
+    "attribution": "Global Disaster Awareness and Coordination System, GDACS",
+    "queryWindowDays": 30,
+    "maxRecordsPerProviderPage": 100
+  },
+  {
+    "id": "open-meteo-weather",
+    "source": "https://open-meteo.com/en/docs",
+    "hazards": ["weather", "heat", "wind", "precipitation"],
+    "format": "JSON",
+    "dataType": "modelled current values and forecast",
+    "credentialsRequired": false,
+    "forecastDays": 5
+  },
+  {
+    "id": "open-meteo-air-quality",
+    "source": "https://open-meteo.com/en/docs/air-quality-api",
+    "hazards": ["air-quality", "smoke"],
+    "format": "JSON",
+    "dataType": "air-quality model forecast",
+    "credentialsRequired": false
+  },
+  {
+    "id": "nasa-firms",
+    "source": "https://firms.modaps.eosdis.nasa.gov/content/active_fire/",
+    "hazards": ["wildfire"],
+    "format": "CSV, KML, shapefile, service",
+    "dataType": "satellite fire detection",
+    "credentialsRequired": true,
+    "credentialVariable": "FIRMS_MAP_KEY",
+    "enabled": false
+  }
+]
