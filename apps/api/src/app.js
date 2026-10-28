@@ -69,7 +69,7 @@ const databaseRoutePrefixes = [
 
 app.use(async (req, res, next) => {
   const path = req.path;
-  const isHealthCheck = path === "/api/v1/health";
+  const isHealthCheck = ["/", "/health", "/api/health", "/v1/health", "/api/v1/health"].includes(path);
   const needsDatabase =
     isHealthCheck ||
     databaseRoutePrefixes.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
