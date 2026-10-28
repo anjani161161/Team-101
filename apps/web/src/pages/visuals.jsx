@@ -241,7 +241,7 @@ export function VisualLibraryPage() {
       {visuals.error && <ErrorState message={visuals.error} onRetry={visuals.refresh} />}
 
       {canManage && (
-        <Panel className="visual-editor-panel" id="visual-editor">
+        <div id="visual-editor"><Panel className="visual-editor-panel">
           <SectionTitle
             title={editingId ? "Edit visual content" : "Add visual content"}
             description={user?.role === "ADMIN"
@@ -302,7 +302,7 @@ export function VisualLibraryPage() {
               {editingId && <Button type="button" variant="secondary" onClick={cancelEdit}><X size={15} /> Cancel edit</Button>}
             </div>
           </form>
-        </Panel>
+        </Panel></div>
       )}
 
       <section className="visual-gallery-section">
