@@ -5,6 +5,7 @@ import { getGdacsEvents } from "../../services/providers.js";
 
 const router = Router();
 const FEED_URL = "https://earthobservatory.nasa.gov/feeds/image-of-the-day.rss";
+const NDRF_NEWS_URL = "https://www.ndrf.gov.in/news-clippings";
 const CACHE_MS = 20 * 60 * 1000;
 const hazardWords =
   /wildfire|fire|flood|cyclone|storm|hurricane|typhoon|drought|heatwave|landslide|earthquake|tsunami|disaster|volcano|extreme weather/i;
@@ -91,6 +92,62 @@ function safeImageFromItem(item) {
   return { url: credit ? url : null, alt: image.attr("alt") || "", credit };
 }
 
+export function normalizeNdrfArticles(html) {
+  const $ = load(html);
+  const items = [];
+  $("table tr").each((_, row) => {
+    const cells = $(row).find("td");
+    if (cells.length < 3) return;
+    const anchor = $(cells[1]).find("a").first();
+    const title = anchor.text().replace(/\\s+/g, " ").trim();
+    const href = anchor.attr("href");
+    const dateText = $(cells[cells.length - 1]).text().replace(/\\s+/g, " ").trim();
+    if (!title || !href) return;
+    const searchable = title.toLowerCase();
+    if (!/(disaster|flood|cyclone|storm|fire|landslide|earthquake|rescue|emergency|evacuat|preparedness|mock drill|hazard|chemical|gas leak|collapse|response)/i.test(searchable)) return;
+
+    let originalUrl;
+    try {
+      const parsed = new URL(href, NDRF_NEWS_URL);
+      if (parsed.protocol !== "https:" || parsed.username || parsed.password) return;
+      originalUrl = parsed.toString();
+    } catch {
+      return;
+    }
+
+    let publishedAt = null;
+    const dateMatch = dateText.match(/^(\\d{1,2})[/-](\\d{1,2})[/-](\\d{4})$/);
+    if (dateMatch) {
+      const day = Number(dateMatch[1]);
+      const month = Number(dateMatch[2]);
+      const year = Number(dateMatch[3]);
+      const value = new Date(Date.UTC(year, month - 1, day));
+      if (value.getUTCFullYear() === year && value.getUTCMonth() === month - 1 && value.getUTCDate() === day)
+        publishedAt = value.toISOString();
+    } else {
+      const parsedDate = new Date(dateText);
+      if (!Number.isNaN(parsedDate.getTime())) publishedAt = parsedDate.toISOString();
+    }
+
+    items.push({
+      id: `ndrf-${Buffer.from(originalUrl).toString("base64url").slice(-18)}`,
+      title,
+      summary: "News clipping listed by the National Disaster Response Force. Open the original publisher for full reporting and context.",
+      category: categoryFor(searchable),
+      location: null,
+      publishedAt,
+      originalUrl,
+      publisher: "NDRF news clippings",
+      imageUrl: null,
+      imageAlt: "",
+      imageCredit: null,
+      imageLicenseNote: null,
+      sourceType: "news-clipping",
+    });
+  });
+  return items.sort((a, b) => (Date.parse(b.publishedAt || "") || 0) - (Date.parse(a.publishedAt || "") || 0)).slice(0, 30);
+}
+
 export function normalizeNasaStories(xml) {
   const parsed = parser.parse(xml);
   const rawItems = parsed?.rss?.channel?.item;
@@ -133,7 +190,7 @@ export function normalizeNasaStories(xml) {
 
 async function refreshFeed() {
   if (feedCache && Date.now() - feedCache.refreshedAt < CACHE_MS) return feedCache;
-  const [storiesResult, eventsResult] = await Promise.allSettled([
+  const [storiesResult, eventsResult, articlesResult] = await Promise.allSettled([
     (async () => {
       const response = await fetch(FEED_URL, {
         headers: { "User-Agent": "AtmosWatch-Education/1.0 (disaster learning hub)" },
@@ -145,26 +202,37 @@ async function refreshFeed() {
       return normalizeNasaStories(xml);
     })(),
     getGdacsEvents({ limit: 24 }),
+    (async () => {
+      const response = await fetch(NDRF_NEWS_URL, {
+        headers: { "User-Agent": "AtmosWatch-Education/1.0 (disaster article listing)" },
+        signal: AbortSignal.timeout(9000),
+      });
+      if (!response.ok) throw new Error(`NDRF news page returned HTTP ${response.status}`);
+      const html = await response.text();
+      if (html.length > 5_000_000) throw new Error("NDRF news response exceeded the size limit");
+      return normalizeNdrfArticles(html);
+    })(),
   ]);
   const stories = storiesResult.status === "fulfilled" ? storiesResult.value : null;
   const events =
     eventsResult.status === "fulfilled"
       ? eventsResult.value.map((event) => ({ ...event, sourceUrl: safeGdacsUrl(event.sourceUrl) }))
       : null;
+  const articles = articlesResult.status === "fulfilled" ? articlesResult.value : null;
   const sourceErrors = [
     storiesResult.status === "rejected"
-      ? {
-          source: "NASA Earth Observatory",
-          message: storiesResult.reason?.message || "Source unavailable",
-        }
+      ? { source: "NASA Earth Observatory", message: storiesResult.reason?.message || "Source unavailable" }
       : null,
     eventsResult.status === "rejected"
       ? { source: "GDACS", message: eventsResult.reason?.message || "Source unavailable" }
       : null,
+    articlesResult.status === "rejected"
+      ? { source: "NDRF news clippings", message: articlesResult.reason?.message || "Source unavailable" }
+      : null,
   ].filter(Boolean);
   lastError = sourceErrors.map(({ source, message }) => `${source}: ${message}`).join("; ");
-  if (!stories && !events) {
-    lastError = `Disaster story and event providers are temporarily unavailable. ${lastError}`;
+  if (!stories && !events && !articles) {
+    lastError = `Disaster article and event providers are temporarily unavailable. ${lastError}`;
     if (feedCache)
       return { ...feedCache, stale: true, partial: true, error: lastError, sourceErrors };
     throw Object.assign(new Error(lastError), { status: 502, code: "DISASTER_FEED_UNAVAILABLE" });
@@ -173,9 +241,10 @@ async function refreshFeed() {
   feedCache = {
     stories: stories || feedCache?.stories || [],
     events: events || feedCache?.events || [],
+    articles: articles || feedCache?.articles || [],
     refreshedAt: Date.now(),
     fetchedAt: lastSuccessfulRefresh,
-    partial: !stories || !events,
+    partial: !stories || !events || !articles,
     sourceErrors,
   };
   return feedCache;
@@ -208,6 +277,12 @@ router.get("/disaster-updates", async (req, res, next) => {
       page,
       limit,
       events: data.events,
+      articles: (data.articles || []).filter((article) => {
+        const matchesQuery =
+          !query || `${article.title} ${article.summary} ${article.category} ${article.publisher}`.toLowerCase().includes(query);
+        return matchesQuery && (!category || article.category.toLowerCase() === category);
+      }),
+      articleCount: (data.articles || []).length,
       lastSuccessfulUpdate: data.fetchedAt,
       stale: Boolean(data.stale),
       partial: Boolean(data.partial),
@@ -232,6 +307,15 @@ router.get("/disaster-updates", async (req, res, next) => {
               ? "available"
               : "no-current-events",
         },
+        {
+          name: "NDRF news clippings",
+          url: NDRF_NEWS_URL,
+          status: data.sourceErrors.some((error) => error.source === "NDRF news clippings")
+            ? "unavailable"
+            : (data.articles || []).length
+              ? "available"
+              : "no-matching-articles",
+        },
       ],
     });
   } catch (error) {
@@ -247,6 +331,7 @@ router.get("/disaster-sources/status", (_req, res) => {
     lastError: lastError || null,
     sources: [
       { name: "NASA Earth Observatory RSS", configured: true, url: FEED_URL },
+      { name: "NDRF news clippings", configured: true, url: NDRF_NEWS_URL },
       {
         name: "GDACS events API",
         configured: true,
