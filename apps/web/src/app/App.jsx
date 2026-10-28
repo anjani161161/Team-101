@@ -170,6 +170,7 @@ export default function App() {
         <Route path="/learning/disasters" element={<DisasterLearningHubPage />} />
         <Route path="/learning/disasters/:slug" element={<DisasterTopicPage />} />
         <Route path="/visuals" element={<VisualLibraryPage />} />
+        <Route path="/articles" element={<DisasterUpdatesPage />} />
         <Route path="/simulations" element={<SimulationsPage />} />
         <Route path="/simulations/:scenarioId" element={<ScenarioPage />} />
         <Route path="/intelligence" element={<IntelligencePage />} />
