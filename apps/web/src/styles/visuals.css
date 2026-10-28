@@ -1,0 +1,364 @@
+.visual-library-page {
+  display: grid;
+  gap: 1.35rem;
+}
+
+.visual-featured {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1.1rem;
+  padding: 1.35rem;
+  background: linear-gradient(125deg, #f0f6f5, #f8faf9 65%, #edf3f1);
+  border: 1px solid #dbe5e2;
+  border-radius: 18px;
+}
+
+.visual-featured-icon {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 15px;
+  color: #355f65;
+  background: #dce9e6;
+}
+
+.visual-eyebrow {
+  display: block;
+  margin-bottom: .4rem;
+  color: #54767a;
+  font-size: .72rem;
+  font-weight: 750;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+
+.visual-featured h2,
+.visual-gallery-heading h2 {
+  margin: 0;
+  color: #1a3036;
+  font-size: clamp(1.15rem, 2vw, 1.55rem);
+}
+
+.visual-featured-copy p,
+.visual-gallery-heading p {
+  margin: .5rem 0 0;
+  color: #5e7377;
+  line-height: 1.55;
+}
+
+.visual-featured-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .9rem;
+  margin-top: .75rem;
+  color: #49686d;
+  font-size: .82rem;
+}
+
+.visual-featured-stats span,
+.visual-card-meta,
+.visual-type-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+}
+
+.visual-editor-panel {
+  scroll-margin-top: 1rem;
+}
+
+.visual-editor-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .9rem 1rem;
+}
+
+.visual-editor-form .field {
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+  min-width: 0;
+  color: #516a6e;
+  font-size: .86rem;
+  font-weight: 600;
+}
+
+.visual-editor-form input,
+.visual-editor-form select,
+.visual-editor-form textarea {
+  width: 100%;
+  min-width: 0;
+  padding: .75rem .8rem;
+  border: 1px solid #d4dfdd;
+  border-radius: 9px;
+  background: #fff;
+  color: #20353a;
+  font: inherit;
+  font-weight: 450;
+}
+
+.visual-editor-form input:focus,
+.visual-editor-form select:focus,
+.visual-editor-form textarea:focus {
+  outline: 3px solid #d9e9e6;
+  border-color: #6d9697;
+}
+
+.visual-editor-form small {
+  color: #77898b;
+  font-size: .74rem;
+  line-height: 1.45;
+  font-weight: 450;
+}
+
+.visual-editor-wide {
+  grid-column: 1 / -1;
+}
+
+.visual-editor-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+}
+
+.visual-gallery-section {
+  display: grid;
+  gap: 1rem;
+}
+
+.visual-gallery-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.visual-gallery-count {
+  color: #587378;
+  background: #edf3f2;
+  border: 1px solid #dfe9e7;
+  border-radius: 999px;
+  padding: .45rem .7rem;
+  font-size: .78rem;
+  white-space: nowrap;
+}
+
+.visual-card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.visual-card {
+  overflow: hidden;
+  min-width: 0;
+  background: #fff;
+  border: 1px solid #dfe7e5;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(21, 47, 51, .045);
+}
+
+.visual-media {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  background: #e8efed;
+}
+
+.visual-media img,
+.visual-media video,
+.visual-media iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  border: 0;
+  object-fit: cover;
+  background: #e8efed;
+}
+
+.visual-media iframe {
+  position: absolute;
+  inset: 0;
+}
+
+.visual-type-pill {
+  position: absolute;
+  right: .65rem;
+  bottom: .65rem;
+  padding: .33rem .48rem;
+  border-radius: 999px;
+  color: #fff;
+  background: rgba(20, 44, 48, .84);
+  font-size: .7rem;
+}
+
+.visual-card-body {
+  display: grid;
+  gap: .6rem;
+  padding: 1rem;
+}
+
+.visual-card-topline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+}
+
+.visual-category {
+  color: #58797d;
+  font-size: .76rem;
+  font-weight: 700;
+}
+
+.visual-card h3 {
+  margin: 0;
+  color: #20363b;
+  font-size: 1.04rem;
+  line-height: 1.38;
+}
+
+.visual-card p {
+  margin: 0;
+  color: #617578;
+  font-size: .87rem;
+  line-height: 1.55;
+}
+
+.visual-card-meta {
+  color: #718689;
+  font-size: .75rem;
+  text-transform: capitalize;
+}
+
+.visual-card-actions,
+.visual-editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+}
+
+.visual-card-actions > a {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  color: #466f75;
+  font-size: .8rem;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.visual-editor-actions {
+  justify-content: flex-end;
+  margin-left: auto;
+}
+
+.button-small {
+  padding: .4rem .55rem;
+  font-size: .76rem;
+}
+
+.danger-outline {
+  color: #9c4a45;
+  border-color: #ead4d1;
+}
+
+.visual-notice {
+  padding: .75rem .9rem;
+  border: 1px solid #d8e9e1;
+  border-radius: 9px;
+  color: #2d6550;
+  background: #f0f8f4;
+  font-size: .9rem;
+}
+
+.map-layer-control {
+  position: absolute;
+  z-index: 650;
+  top: .75rem;
+  right: .75rem;
+  display: flex;
+  gap: .2rem;
+  padding: .25rem;
+  border: 1px solid rgba(205, 220, 217, .95);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .96);
+  box-shadow: 0 3px 12px rgba(18, 43, 48, .15);
+}
+
+.map-layer-control button {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .5rem .65rem;
+  border: 0;
+  border-radius: 7px;
+  color: #466268;
+  background: transparent;
+  font: inherit;
+  font-size: .77rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.map-layer-control button.active {
+  color: #fff;
+  background: #527c81;
+}
+
+.map-layer-control button:focus-visible {
+  outline: 2px solid #223f45;
+  outline-offset: 2px;
+}
+
+@media (max-width: 1000px) {
+  .visual-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .visual-featured {
+    grid-template-columns: auto minmax(0, 1fr);
+    padding: 1rem;
+  }
+
+  .visual-featured > .button {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+
+  .visual-editor-form {
+    grid-template-columns: 1fr;
+  }
+
+  .visual-editor-wide {
+    grid-column: auto;
+  }
+
+  .visual-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .visual-gallery-heading {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .map-layer-control {
+    top: .5rem;
+    right: .5rem;
+  }
+
+  .map-layer-control button {
+    padding: .45rem .5rem;
+  }
+}
