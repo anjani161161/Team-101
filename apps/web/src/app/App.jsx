@@ -35,6 +35,7 @@ import {
 } from "../pages/public.jsx";
 import { DisasterLearningHubPage, DisasterTopicPage } from "../pages/disasters.jsx";
 import { DisasterUpdatesPage } from "../pages/disaster-updates.jsx";
+import { VisualLibraryPage } from "../pages/visuals.jsx";
 import { QuizWorkspacePage } from "../pages/quizzes.jsx";
 
 function EntryRoute() {
@@ -168,6 +169,7 @@ export default function App() {
         <Route path="/academy/:moduleId" element={<LessonPage />} />
         <Route path="/learning/disasters" element={<DisasterLearningHubPage />} />
         <Route path="/learning/disasters/:slug" element={<DisasterTopicPage />} />
+        <Route path="/visuals" element={<VisualLibraryPage />} />
         <Route path="/simulations" element={<SimulationsPage />} />
         <Route path="/simulations/:scenarioId" element={<ScenarioPage />} />
         <Route path="/intelligence" element={<IntelligencePage />} />
