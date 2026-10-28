@@ -89,6 +89,8 @@ npm run bootstrap:admin -w @atmoswatch/api -- --confirm # Bootstrap an existing 
 
 The seed command deliberately creates no default credentials or fabricated institution records. Learning and simulation fixtures are curated educational content in `apps/api/src/data/curriculum.js`, not live disaster data.
 
+For an explicitly requested demo workspace, `npm run setup:demo-accounts -w @atmoswatch/api -- --confirm` creates one administrator, two instructors, three students, and a demo institution only when there is no active administrator and none of those demo emails already exist. It generates unique random passwords and prints them once. Keep that output private. It is intentionally separate from the regular seed command and refuses to overwrite existing accounts.
+
 ## Environment variables
 
 | Variable                |         Required | Purpose                                                                    |
