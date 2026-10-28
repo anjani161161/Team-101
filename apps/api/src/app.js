@@ -14,11 +14,13 @@ import resourceRoutes from "./modules/resources/routes.js";
 import userRoutes from "./modules/users/routes.js";
 import publicDisasterUpdatesRoutes from "./modules/public/disaster-updates.js";
 import mongoose from "mongoose";
-import { rateLimit } from "express-rate-limit";
+import { rateLimit, ipKeyGenerator } from "express-rate-limit";
 import { isAllowedOrigin } from "./security/origins.js";
 
 const app = express();
 app.disable("x-powered-by");
+// Vercel runs the API behind its trusted reverse proxy.
+app.set("trust proxy", 1);
 app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 app.use(
   cors({
@@ -56,6 +58,7 @@ app.use((req, _res, next) => {
 const providerLimit = rateLimit({
   windowMs: 60 * 1000,
   limit: 60,
+  keyGenerator: (req) => ipKeyGenerator(req.ip),
   standardHeaders: "draft-8",
   legacyHeaders: false,
 });
